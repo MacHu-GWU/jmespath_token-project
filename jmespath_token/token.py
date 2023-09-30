@@ -47,6 +47,8 @@ class RawToken(BaseToken):
     这种类型的 token 会将 value 中的值原封不动的返回.
 
     :param value: 所要返回的值. 可以是任何对象.
+
+    .. versionadded:: 0.1.1
     """
 
     value: T.Any = dataclasses.field()
@@ -61,6 +63,8 @@ class JmespathToken(BaseToken):
     这种类型的 token 会从一个叫 ``data`` 的字典对象中通过 jmespath 语法获取最终的值.
 
     :param path: jmespath 的语法.
+
+    .. versionadded:: 0.1.1
     """
 
     path: str = dataclasses.field()
@@ -118,6 +122,8 @@ class SubToken(BaseToken):
     :param params: 字符串模板所需的数据, 是一个 key value 键值对, 其中值既可以是 literal,
         也可以是一个 token. 也就是说这个 params 中的 value 的内容也是可以作为 token 被
         evaluate 的. 换言之, 支持嵌套.
+
+    .. versionadded:: 0.1.1
     """
 
     template: T_TOKEN = dataclasses.field()
@@ -145,6 +151,8 @@ class JoinToken(BaseToken):
 
     :param sep: str 或是 token
     :param array: list of str 或是 list of token 或者是一个 evaluate 的结果是 array 的 token.
+
+    .. versionadded:: 0.1.1
     """
 
     sep: T_TOKEN = dataclasses.field()
@@ -156,6 +164,30 @@ class JoinToken(BaseToken):
         """
         return evaluate_token(self.sep, data).join(
             [str(i) for i in evaluate_token(self.array, data)]
+        )
+
+
+@dataclasses.dataclass(frozen=True)
+class SplitToken(BaseToken):
+    """
+    这种类型的 Token 可以用一个分隔符将一个字符串分割为字符串列表. 这里的分隔符和字符串可以是
+    literal, 也可以是一个 token.
+
+    :param sep: str 或是 token
+    :param text: str 或是是一个 evaluate 的结果是 str 的 token.
+
+    .. versionadded:: 0.2.1
+    """
+
+    sep: T_TOKEN = dataclasses.field()
+    text: T_TOKEN = dataclasses.field()
+
+    def evaluate(self, data: T_DATA) -> str:
+        """
+        todo: add docstring
+        """
+        return evaluate_token(self.text, data).split(
+            evaluate_token(self.sep, data)
         )
 
 
@@ -174,6 +206,8 @@ class MapToken(BaseToken):
     :param mapper: key value 键值对, 其中 value 可以是 token, 又或者是一个 evaluate
         的结果是 key value 键值对的 token.
     :param default: 如果 key 不在 mapper 中的默认值.
+
+    .. versionadded:: 0.1.1
     """
 
     key: T_TOKEN = dataclasses.field()
@@ -196,6 +230,7 @@ token_class_mapper = {
     TokenTypeEnum.jmespath.value: JmespathToken,
     TokenTypeEnum.sub.value: SubToken,
     TokenTypeEnum.join.value: JoinToken,
+    TokenTypeEnum.split.value: SplitToken,
     TokenTypeEnum.map.value: MapToken,
 }
 
@@ -256,6 +291,8 @@ def evaluate_token(
     这里注意的是如果想要返回的值是一个字典或是列表, 但你希望它是一个 literal, 并不希望杯 evaluate,
      那么, 你需要用 ``RawToken`` 的语法显式的指定它是一个 Raw, 例如
      ``{"type": "raw", "kwargs": {"value": my_dictionary_here}}``.
+
+     .. versionadded:: 0.1.1
     """
     if isinstance(token, str):
         if token.startswith("$"):

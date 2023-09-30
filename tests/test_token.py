@@ -6,6 +6,7 @@ from jmespath_token.token import (
     JmespathToken,
     SubToken,
     JoinToken,
+    SplitToken,
     MapToken,
     evaluate_token,
 )
@@ -111,6 +112,48 @@ class Test:
             ],
         )
         assert token.evaluate({"firstname": "John", "lastname": "Doe"}) == "Doe, John"
+
+    def _test_SplitToken(self):
+        # seder
+        token = SplitToken(
+            sep=",",
+            text="blue,green",
+        )
+        dct = {
+            "sep": ",",
+            "text": "blue,green",
+        }
+        assert token.to_dict() == dct
+        assert SplitToken.from_dict(dct) == token
+
+        # simple case
+        token = SplitToken(
+            sep=",",
+            text="blue,green",
+        )
+        assert token.evaluate({}) == ["blue", "green"]
+
+        token = SplitToken(
+            sep="$sep",
+            text="$text",
+        )
+        assert token.evaluate({"sep": ",", "text": "blue,green"}) == ["blue", "green"]
+
+        # nested
+        token = SplitToken(
+            sep=", ",
+            text={
+                "type": TokenTypeEnum.join,
+                "kwargs": {
+                    "sep": ", ",
+                    "array": ["$lastname", "$firstname"],
+                },
+            },
+        )
+        assert token.evaluate({"firstname": "John", "lastname": "Doe"}) == [
+            "Doe",
+            "John",
+        ]
 
     def _test_MapToken(self):
         token = MapToken(
@@ -233,6 +276,24 @@ class Test:
             == "Doe, John"
         )
 
+        # split token
+        assert evaluate_token(
+            {
+                "type": TokenTypeEnum.split,
+                "kwargs": {
+                    "sep": ", ",
+                    "text": {
+                        "type": TokenTypeEnum.join,
+                        "kwargs": {
+                            "sep": ", ",
+                            "array": ["$lastname", "$firstname"],
+                        },
+                    },
+                },
+            },
+            data,
+        ) == ["Doe", "John"]
+
         # map token
         assert (
             evaluate_token(
@@ -292,6 +353,7 @@ class Test:
         self._test_JmespathToken()
         self._test_SubToken()
         self._test_JoinToken()
+        self._test_SplitToken()
         self._test_MapToken()
         self._test_evaluate_token_simple_case()
         self._test_evaluate_deeply_nested_token()
