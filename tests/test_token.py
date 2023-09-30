@@ -9,7 +9,6 @@ from jmespath_token.token import (
     MapToken,
     evaluate_token,
 )
-from rich import print as rprint
 
 data = {
     "firstname": "John",
