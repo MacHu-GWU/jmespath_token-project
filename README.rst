@@ -1,5 +1,5 @@
 
-.. image:: https://readthedocs.org/projects/jmespath-token/badge/?version=latest
+.. .. image:: https://readthedocs.org/projects/jmespath-token/badge/?version=latest
     :target: https://jmespath-token.readthedocs.io/en/latest/
     :alt: Documentation Status
 
@@ -26,10 +26,10 @@
 
 ------
 
-.. image:: https://img.shields.io/badge/Link-Document-blue.svg
+.. .. image:: https://img.shields.io/badge/Link-Document-blue.svg
     :target: https://jmespath-token.readthedocs.io/en/latest/
 
-.. image:: https://img.shields.io/badge/Link-API-blue.svg
+.. .. image:: https://img.shields.io/badge/Link-API-blue.svg
     :target: https://jmespath-token.readthedocs.io/en/latest/py-modindex.html
 
 .. image:: https://img.shields.io/badge/Link-Install-blue.svg
@@ -50,7 +50,9 @@
 
 Welcome to ``jmespath_token`` Documentation
 ==============================================================================
-Documentation for ``jmespath_token``.
+Tokens represent values that can be evaluated at a later time. This is a token system built on Jmespath JSON query language.
+
+This project is highly inspired by `AWS CloudFormation Intrinsic Functions <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html>`_.
 
 
 .. _install:
