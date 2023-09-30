@@ -54,6 +54,8 @@ Tokens represent values that can be evaluated at a later time. This is a token s
 
 This project is highly inspired by `AWS CloudFormation Intrinsic Functions <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html>`_.
 
+`📔 Usage Example <https://github.com/MacHu-GWU/jmespath_token-project/blob/main/docs/source/01-Usage-Example/index.ipynb>`_
+
 
 .. _install:
 
