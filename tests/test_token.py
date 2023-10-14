@@ -8,6 +8,8 @@ from jmespath_token.token import (
     JoinToken,
     SplitToken,
     MapToken,
+    SelectToken,
+    SliceToken,
     evaluate_token,
 )
 
@@ -178,6 +180,125 @@ class Test:
             default="unknown",
         )
         assert token.evaluate(data={"alice": "girl"}) == "girl"
+
+    def _test_SelectToken(self):
+        # simple case
+        token = SelectToken(
+            index="$index",
+            array=["hello", "$firstname"],
+        )
+        data = {"index": 0, "firstname": "John"}
+        assert token.evaluate(data) == "hello"
+        data = {"index": 1, "firstname": "John"}
+        assert token.evaluate(data) == "John"
+
+        token = SelectToken(
+            index="$index",
+            array="$array",
+        )
+        data = {"index": 0, "array": ["a", "b"]}
+        assert token.evaluate(data) == "a"
+        data = {"index": 1, "array": ["a", "b"]}
+        assert token.evaluate(data) == "b"
+
+    def _test_SliceToken(self):
+        # simple case
+        token = SliceToken(
+            start=1,
+            end=3,
+            array=[1, 2, 3, 4, 5],
+        )
+        assert token.evaluate(None) == [2, 3]
+
+        token = SliceToken(
+            array=[1, 2, 3, 4, 5],
+        )
+        assert token.evaluate(None) == [1, 2, 3, 4, 5]
+
+        token = SliceToken(
+            start=2,
+            array=[1, 2, 3, 4, 5],
+        )
+        assert token.evaluate(None) == [3, 4, 5]
+
+        token = SliceToken(
+            end=-2,
+            array=[1, 2, 3, 4, 5],
+        )
+        assert token.evaluate(None) == [1, 2, 3]
+
+        token = SliceToken(
+            start="$start",
+            end="$end",
+            array=["$a1", "$a2", "$a3", "$a4", "$a5"],
+        )
+        data = {"start": 1, "end": 3, "a1": 1, "a2": 2, "a3": 3, "a4": 4, "a5": 5}
+        assert token.evaluate(data) == [2, 3]
+
+        token = SliceToken(
+            start="$start",
+            end="$end",
+            array=[
+                {
+                    "type": TokenTypeEnum.map,
+                    "kwargs": {
+                        "key": "$a1",
+                        "mapper": "$mapper",
+                    },
+                },
+                {
+                    "type": TokenTypeEnum.map,
+                    "kwargs": {
+                        "key": "$a2",
+                        "mapper": "$mapper",
+                    },
+                },
+                {
+                    "type": TokenTypeEnum.map,
+                    "kwargs": {
+                        "key": "$a3",
+                        "mapper": "$mapper",
+                    },
+                },
+                {
+                    "type": TokenTypeEnum.map,
+                    "kwargs": {
+                        "key": "$a4",
+                        "mapper": "$mapper",
+                    },
+                },
+                {
+                    "type": TokenTypeEnum.map,
+                    "kwargs": {
+                        "key": "$a5",
+                        "mapper": "$mapper",
+                    },
+                },
+            ],
+        )
+        data = {
+            "start": 1,
+            "end": 3,
+            "a1": "a1",
+            "a2": "a2",
+            "a3": "a3",
+            "a4": "a4",
+            "a5": "a5",
+            "mapper": {"a1": 1, "a2": 2, "a3": 3, "a4": 4, "a5": 5},
+        }
+        assert token.evaluate(data) == [2, 3]
+
+    # data = {"index": 1, "firstname": "John"}
+    # assert token.evaluate(data) == "John"
+    #
+    # token = SelectToken(
+    #     index="$index",
+    #     array="$array",
+    # )
+    # data = {"index": 0, "array": ["a", "b"]}
+    # assert token.evaluate(data) == "a"
+    # data = {"index": 1, "array": ["a", "b"]}
+    # assert token.evaluate(data) == "b"
 
     def _test_evaluate_token_simple_case(self):
         # implicit raw token
@@ -355,6 +476,8 @@ class Test:
         self._test_JoinToken()
         self._test_SplitToken()
         self._test_MapToken()
+        self._test_SelectToken()
+        self._test_SliceToken()
         self._test_evaluate_token_simple_case()
         self._test_evaluate_deeply_nested_token()
 

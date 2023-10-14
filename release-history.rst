@@ -15,6 +15,15 @@ x.y.z (Backlog)
 **Miscellaneous**
 
 
+0.3.1 (2023-10-14)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Features and Improvements**
+
+- Add the following public API:
+    - ``jmespath_token.api.SelectToken``
+    - ``jmespath_token.api.SliceToken``
+
+
 0.2.1 (2023-09-30)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **Features and Improvements**

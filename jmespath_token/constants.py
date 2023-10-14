@@ -29,5 +29,7 @@ class TokenTypeEnum(BetterStrEnum):
     join = "Token::Join"
     split = "Token::Split"
     map = "Token::Map"
+    select = "Token::Select"
+    slice = "Token::Slice"
 
 TYPE = "type"

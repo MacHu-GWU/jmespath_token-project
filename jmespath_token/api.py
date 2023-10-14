@@ -13,4 +13,6 @@ from .token import JmespathToken
 from .token import SubToken
 from .token import JoinToken
 from .token import MapToken
+from .token import SelectToken
+from .token import SliceToken
 from .token import evaluate_token

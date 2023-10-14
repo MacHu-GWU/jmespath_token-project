@@ -186,9 +186,7 @@ class SplitToken(BaseToken):
         """
         todo: add docstring
         """
-        return evaluate_token(self.text, data).split(
-            evaluate_token(self.sep, data)
-        )
+        return evaluate_token(self.text, data).split(evaluate_token(self.sep, data))
 
 
 @dataclasses.dataclass(frozen=True)
@@ -218,11 +216,62 @@ class MapToken(BaseToken):
         """
         todo: add docstring
         """
-        # mapper = self._evaluate_mapper(data)
         return evaluate_token(self.mapper, data).get(
             evaluate_token(self.key, data),
             evaluate_token(self.default, data),
         )
+
+
+@dataclasses.dataclass(frozen=True)
+class SelectToken(BaseToken):
+    """
+    这种类型的 token 可以从一个 array 中通过 index 取值.
+
+    :param index: 显示给定的 index 整数, 或是 token
+    :param array: list of str 或是 list of token 或者是一个 evaluate 的结果是 array 的 token.
+
+    .. versionadded:: 0.3.1
+    """
+
+    index: T_TOKEN = dataclasses.field()
+    array: T.Union[T_TOKEN, T.List[T_TOKEN]] = dataclasses.field()
+
+    def evaluate(self, data: T_DATA) -> T.Any:  # pragma: no cover
+        index = evaluate_token(self.index, data)
+        array = evaluate_token(self.array, data)
+        return array[index]
+
+
+@dataclasses.dataclass(frozen=True)
+class SliceToken(BaseToken):
+    """
+    这种类型的 token 可以从一个 array 中通过 python slice 语法取值.
+
+    :param start: 显示给定的 index 整数, 或是 token
+    :param end: 显示给定的 index 整数, 或是 token
+    :param array: list of str 或是 list of token 或者是一个 evaluate 的结果是 array 的 token.
+
+    .. versionadded:: 0.3.1
+    """
+
+    start: T.Optional[T_TOKEN] = dataclasses.field(default=None)
+    end: T.Optional[T_TOKEN] = dataclasses.field(default=None)
+    array: T.Union[T_TOKEN, T.List[T_TOKEN]] = dataclasses.field(default_factory=list)
+
+    def evaluate(self, data: T_DATA) -> T.Any:  # pragma: no cover
+        array = evaluate_token(self.array, data)
+        start = evaluate_token(self.start, data)
+        end = evaluate_token(self.end, data)
+        if start is None and end is None:
+            return array
+        elif start is not None and end is not None:
+            return array[start:end]
+        elif start is not None:
+            return array[start:]
+        elif end is not None:
+            return array[:end]
+        else:  # pragma: no cover
+            raise NotImplementedError
 
 
 token_class_mapper = {
@@ -232,6 +281,8 @@ token_class_mapper = {
     TokenTypeEnum.join.value: JoinToken,
     TokenTypeEnum.split.value: SplitToken,
     TokenTypeEnum.map.value: MapToken,
+    TokenTypeEnum.select.value: SelectToken,
+    TokenTypeEnum.slice.value: SliceToken,
 }
 
 
